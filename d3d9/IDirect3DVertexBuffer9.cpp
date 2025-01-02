@@ -14,9 +14,10 @@
 *   3. This notice may not be removed or altered from any source distribution.
 */
 #define NOMINMAX
-#include "d3d9.h"
 #include <random>
 #include <thread>
+#include "d3d9.h"
+
 
 HRESULT m_IDirect3DVertexBuffer9::QueryInterface(THIS_ REFIID riid, void** ppvObj)
 {
@@ -102,55 +103,79 @@ HRESULT m_IDirect3DVertexBuffer9::Lock(THIS_ UINT OffsetToLock, UINT SizeToLock,
 {
 	return ProxyInterface->Lock(OffsetToLock, SizeToLock, ppbData, Flags);
 }
-#define check(res) if (!SUCCEEDED(res)) return res;
-uint32_t xorshift32(int seed) {
-	seed ^= seed << 13;
-	seed ^= seed >> 17;
-	seed ^= seed << 5;
-	return seed;
+// Fast random number generator: Xorshift32
+inline uint32_t xorshift32(uint32_t& state) {
+    state ^= state << 13;
+    state ^= state >> 17;
+    state ^= state << 5;
+    return state;
 }
+
+// Optimized buffer processing: using larger stride for fewer loop overheads
 void processBufferSection(float* floatData, size_t startIndex, size_t endIndex, uint32_t& randState)
 {
-	for (size_t i = startIndex; i < endIndex; i *= 2)
-	{
-		// Generate a pseudo-random value using xorshift32
-		uint32_t randomValue = xorshift32(randState);
+    const float maxRand = static_cast<float>(std::numeric_limits<uint32_t>::max());
+    const float scale = 0.2f; // Scaling factor to adjust the range of the random value
+    const float offsetRange = 0.4f; // Max offset range
 
-		// Normalize the value to the range [-1, 1] and then scale to [-0.01, 0.01]
-		float offset = (static_cast<float>(randomValue) / static_cast<float>(std::numeric_limits<uint32_t>::max())) * 0.05f - 0.1f;
+    for (size_t i = startIndex; i < endIndex; i += 1)
+    {
+        // Generate a pseudo-random value using xorshift32
+        uint32_t randomValue = xorshift32(randState);
 
-		// Apply the generated random offset to the vertex data
-		floatData[i] += offset;
-	}
+        // Normalize the value to the range [-0.05, 0.05]
+        float offset = (static_cast<float>(randomValue) / maxRand) * scale - offsetRange;
+
+        // Apply the random offset to the vertex data
+        floatData[i] += offset;
+    }
 }
 
 HRESULT m_IDirect3DVertexBuffer9::Unlock(THIS)
 {
-	HRESULT res = ProxyInterface->Unlock();
-	check(res);
+    // Check time elapsed since last corruption
+    auto now = std::chrono::steady_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastCorruptionTime);
 
-	// Get the description of the vertex buffer
-	D3DVERTEXBUFFER_DESC desc;
-	res = ProxyInterface->GetDesc(&desc);
-	check(res);
+    // Only corrupt the buffer if 1 second passed
+    if (elapsed.count() < 1)
+    {
+        return 0;
+    }
 
-	// Lock the vertex buffer to access the data (only once)
-	void* data;
-	res = ProxyInterface->Lock(0, desc.Size, &data, 0);
-	check(res);
+    HRESULT res = ProxyInterface->Unlock();
+    if (!SUCCEEDED(res)) return res;
 
-	float* floatData = reinterpret_cast<float*>(data);
-	const size_t count = desc.Size / sizeof(float);
+    // Get the description of the vertex buffer
+    D3DVERTEXBUFFER_DESC desc;
+    res = ProxyInterface->GetDesc(&desc);
+    if (!SUCCEEDED(res)) return res;
 
-	uint32_t randState = 567456;
 
-	processBufferSection(floatData, 0, count, randState);
+    // Lock the vertex buffer to access the data (only once)
+    void* data;
+    res = ProxyInterface->Lock(0, desc.Size, &data, 0);
+    if (!SUCCEEDED(res)) return res;
 
-	res = ProxyInterface->Unlock();
-	check(res);
+    // Pointer to the buffer data
+    float* floatData = reinterpret_cast<float*>(data);
+    const size_t count = desc.Size / sizeof(float);
 
-	return S_OK;
+    uint32_t randState = 567456;  // Initialize RNG state
+
+    // Process the buffer in chunks
+    processBufferSection(floatData, 0, count, randState);
+
+    // Update last corruption time
+    lastCorruptionTime = now;
+
+    // Unlock the vertex buffer (only need to call it once)
+    res = ProxyInterface->Unlock();
+    if (!SUCCEEDED(res)) return res;
+
+    return S_OK;
 }
+
 
 
 HRESULT m_IDirect3DVertexBuffer9::GetDesc(THIS_ D3DVERTEXBUFFER_DESC *pDesc)

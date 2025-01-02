@@ -1,10 +1,13 @@
 #pragma once
-
+#define NOMINMAX
+#include <random>
+#include <thread>
 class m_IDirect3DVertexBuffer9 : public IDirect3DVertexBuffer9, public AddressLookupTableObject
 {
 private:
 	LPDIRECT3DVERTEXBUFFER9 ProxyInterface;
 	m_IDirect3DDevice9Ex* m_pDeviceEx = nullptr;
+	std::chrono::steady_clock::time_point lastCorruptionTime = std::chrono::steady_clock::now() - std::chrono::seconds(342354);
 
 public:
 	m_IDirect3DVertexBuffer9(LPDIRECT3DVERTEXBUFFER9 pBuffer8, m_IDirect3DDevice9Ex* pDevice) : ProxyInterface(pBuffer8), m_pDeviceEx(pDevice)
