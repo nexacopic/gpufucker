@@ -1,9 +1,21 @@
 # GPUFUCKER
+
 ### About
-Messes with the direct x calls because i thought it would be funny. i know hilarous
-PLEASE PLEASE PLEASE be careful as i have no idea if this will break stuff
-DO NOT REPLACE THE SYSTEM32 DLLS WITH THESE I HAVE NOT TESTED AND IT WILL BRICK YOUR WINDOWS INSTALL
-ok have fun
+
+This project manipulates DirectX calls because I thought it would be funny. Yes, I know, hilarious.
+
+**IMPORTANT:** Please be extremely careful. I have no idea if this will break your system in any way.
+
+**DO NOT** replace any system DLLs (like those in System32) with these files. I have not tested them, and doing so **may brick your Windows installation**.
+
+Okay, now go have fun!
+
+### Progress
+
+- DirectX 1-7, DirectDraw, and Direct3D (ddraw.dll) --------- **NOT STARTED**
+- DirectX 8, Direct3D (d3d8.dll) ------------------------------- **NOT STARTED**
+- DirectX 9, Direct3D (d3d9.dll) ------------------------------- **STARTED** (No progress yet)
+
 
 # ORIGINAL README
 # DirectX Wrappers
