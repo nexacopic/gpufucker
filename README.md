@@ -1,3 +1,11 @@
+# GPUFUCKER
+### About
+Messes with the direct x calls because i thought it would be funny. i know hilarous
+PLEASE PLEASE PLEASE be careful as i have no idea if this will break stuff
+DO NOT REPLACE THE SYSTEM32 DLLS WITH THESE I HAVE NOT TESTED AND IT WILL BRICK YOUR WINDOWS INSTALL
+ok have fun
+
+# ORIGINAL README
 # DirectX Wrappers
 
 ### Introduction
