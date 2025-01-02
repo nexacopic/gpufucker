@@ -18,7 +18,7 @@ Okay, now go have fun!
 - DirectX 8, Direct3D (d3d8.dll) ------------------------------- **NOT STARTED**
 - DirectX 9, Direct3D (d3d9.dll) ------------------------------- **STARTED** (No progress yet)
 
-
+##### oh yeah this is a *MODIFIED* version of the repository "DirectX Wrappers" go check that out <3
 # ORIGINAL README
 # DirectX Wrappers
 
