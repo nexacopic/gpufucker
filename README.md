@@ -10,6 +10,8 @@ This project manipulates DirectX calls because I thought it would be funny. Yes,
 
 Okay, now go have fun!
 
+(Only 32 bit is supported atm, this is due to the original DirectX Wrappers repo not supporting it. I may add support soon...)
+
 ### Progress
 
 - DirectX 1-7, DirectDraw, and Direct3D (ddraw.dll) --------- **NOT STARTED**
