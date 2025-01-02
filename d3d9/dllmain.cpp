@@ -16,8 +16,6 @@
 
 #include "d3d9.h"
 
-std::ofstream Log::LOG("d3d9.log");
-
 Direct3DShaderValidatorCreate9Proc m_pDirect3DShaderValidatorCreate9;
 PSGPErrorProc m_pPSGPError;
 PSGPSampleTextureProc m_pPSGPSampleTexture;
@@ -41,93 +39,96 @@ bool WINAPI DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 	switch (dwReason)
 	{
 	case DLL_PROCESS_ATTACH:
-		// Create log window
+		// Create log window and redirect output to the console
+		FreeConsole();
 		AllocConsole();
 		SetConsoleTitle(TEXT("GPUFUCKER"));
+
+		// Redirect stdout to the new console
+		freopen("CONOUT$", "w", stdout); // Redirect stdout to the console
+
+		// Output to console
 		printf("[ info ] attached\n");
-		Log() << "[ info ] DLL attached.";
 
 		// Load DLL
 		char path[MAX_PATH];
 		GetSystemDirectoryA(path, MAX_PATH);
 		strcat_s(path, "\\d3d9.dll");
-		Log() << "Loading " << path;
 		printf("[ info ] loading original d3d9 from \"%s\"\n", path);
 		d3d9dll = LoadLibraryA(path);
 
-		// Get function addresses
-		Log() << "[ info ] getting function \"Direct3DShaderValidatorCreate9\"";
+		// Get function addresses and output to console
+		printf("[ info ] getting function \"Direct3DShaderValidatorCreate9\"\n");
 		m_pDirect3DShaderValidatorCreate9 = (Direct3DShaderValidatorCreate9Proc)GetProcAddress(d3d9dll, "Direct3DShaderValidatorCreate9");
-		Log() << "[ info ] got function \"Direct3DShaderValidatorCreate9\"";
+		printf("[ info ] got function \"Direct3DShaderValidatorCreate9\"\n");
 
-		Log() << "[ info ] getting function \"PSGPError\"";
+		printf("[ info ] getting function \"PSGPError\"\n");
 		m_pPSGPError = (PSGPErrorProc)GetProcAddress(d3d9dll, "PSGPError");
-		Log() << "[ info ] got function \"PSGPError\"";
+		printf("[ info ] got function \"PSGPError\"\n");
 
-		Log() << "[ info ] getting function \"PSGPSampleTexture\"";
+		printf("[ info ] getting function \"PSGPSampleTexture\"\n");
 		m_pPSGPSampleTexture = (PSGPSampleTextureProc)GetProcAddress(d3d9dll, "PSGPSampleTexture");
-		Log() << "[ info ] got function \"PSGPSampleTexture\"";
+		printf("[ info ] got function \"PSGPSampleTexture\"\n");
 
-		Log() << "[ info ] getting function \"D3DPERF_BeginEvent\"";
+		printf("[ info ] getting function \"D3DPERF_BeginEvent\"\n");
 		m_pD3DPERF_BeginEvent = (D3DPERF_BeginEventProc)GetProcAddress(d3d9dll, "D3DPERF_BeginEvent");
-		Log() << "[ info ] got function \"D3DPERF_BeginEvent\"";
+		printf("[ info ] got function \"D3DPERF_BeginEvent\"\n");
 
-		Log() << "[ info ] getting function \"D3DPERF_EndEvent\"";
+		printf("[ info ] getting function \"D3DPERF_EndEvent\"\n");
 		m_pD3DPERF_EndEvent = (D3DPERF_EndEventProc)GetProcAddress(d3d9dll, "D3DPERF_EndEvent");
-		Log() << "[ info ] got function \"D3DPERF_EndEvent\"";
+		printf("[ info ] got function \"D3DPERF_EndEvent\"\n");
 
-		Log() << "[ info ] getting function \"D3DPERF_GetStatus\"";
+		printf("[ info ] getting function \"D3DPERF_GetStatus\"\n");
 		m_pD3DPERF_GetStatus = (D3DPERF_GetStatusProc)GetProcAddress(d3d9dll, "D3DPERF_GetStatus");
-		Log() << "[ info ] got function \"D3DPERF_GetStatus\"";
+		printf("[ info ] got function \"D3DPERF_GetStatus\"\n");
 
-		Log() << "[ info ] getting function \"D3DPERF_QueryRepeatFrame\"";
+		printf("[ info ] getting function \"D3DPERF_QueryRepeatFrame\"\n");
 		m_pD3DPERF_QueryRepeatFrame = (D3DPERF_QueryRepeatFrameProc)GetProcAddress(d3d9dll, "D3DPERF_QueryRepeatFrame");
-		Log() << "[ info ] got function \"D3DPERF_QueryRepeatFrame\"";
+		printf("[ info ] got function \"D3DPERF_QueryRepeatFrame\"\n");
 
-		Log() << "[ info ] getting function \"D3DPERF_SetMarker\"";
+		printf("[ info ] getting function \"D3DPERF_SetMarker\"\n");
 		m_pD3DPERF_SetMarker = (D3DPERF_SetMarkerProc)GetProcAddress(d3d9dll, "D3DPERF_SetMarker");
-		Log() << "[ info ] got function \"D3DPERF_SetMarker\"";
+		printf("[ info ] got function \"D3DPERF_SetMarker\"\n");
 
-		Log() << "[ info ] getting function \"D3DPERF_SetOptions\"";
+		printf("[ info ] getting function \"D3DPERF_SetOptions\"\n");
 		m_pD3DPERF_SetOptions = (D3DPERF_SetOptionsProc)GetProcAddress(d3d9dll, "D3DPERF_SetOptions");
-		Log() << "[ info ] got function \"D3DPERF_SetOptions\"";
+		printf("[ info ] got function \"D3DPERF_SetOptions\"\n");
 
-		Log() << "[ info ] getting function \"D3DPERF_SetRegion\"";
+		printf("[ info ] getting function \"D3DPERF_SetRegion\"\n");
 		m_pD3DPERF_SetRegion = (D3DPERF_SetRegionProc)GetProcAddress(d3d9dll, "D3DPERF_SetRegion");
-		Log() << "[ info ] got function \"D3DPERF_SetRegion\"";
+		printf("[ info ] got function \"D3DPERF_SetRegion\"\n");
 
-		Log() << "[ info ] getting function \"DebugSetLevel\"";
+		printf("[ info ] getting function \"DebugSetLevel\"\n");
 		m_pDebugSetLevel = (DebugSetLevelProc)GetProcAddress(d3d9dll, "DebugSetLevel");
-		Log() << "[ info ] got function \"DebugSetLevel\"";
+		printf("[ info ] got function \"DebugSetLevel\"\n");
 
-		Log() << "[ info ] getting function \"DebugSetMute\"";
+		printf("[ info ] getting function \"DebugSetMute\"\n");
 		m_pDebugSetMute = (DebugSetMuteProc)GetProcAddress(d3d9dll, "DebugSetMute");
-		Log() << "[ info ] got function \"DebugSetMute\"";
+		printf("[ info ] got function \"DebugSetMute\"\n");
 
-		Log() << "[ info ] getting function \"Direct3D9EnableMaximizedWindowedModeShim\"";
+		printf("[ info ] getting function \"Direct3D9EnableMaximizedWindowedModeShim\"\n");
 		m_pDirect3D9EnableMaximizedWindowedModeShim = (Direct3D9EnableMaximizedWindowedModeShimProc)GetProcAddress(d3d9dll, "Direct3D9EnableMaximizedWindowedModeShim");
-		Log() << "[ info ] got function \"Direct3D9EnableMaximizedWindowedModeShim\"";
+		printf("[ info ] got function \"Direct3D9EnableMaximizedWindowedModeShim\"\n");
 
-		Log() << "[ info ] getting function \"Direct3DCreate9\"";
+		printf("[ info ] getting function \"Direct3DCreate9\"\n");
 		m_pDirect3DCreate9 = (Direct3DCreate9Proc)GetProcAddress(d3d9dll, "Direct3DCreate9");
-		Log() << "[ info ] got function \"Direct3DCreate9\"";
+		printf("[ info ] got function \"Direct3DCreate9\"\n");
 
-		Log() << "[ info ] getting function \"Direct3DCreate9Ex\"";
+		printf("[ info ] getting function \"Direct3DCreate9Ex\"\n");
 		m_pDirect3DCreate9Ex = (Direct3DCreate9ExProc)GetProcAddress(d3d9dll, "Direct3DCreate9Ex");
-		Log() << "[ info ] got function \"Direct3DCreate9Ex\"";
+		printf("[ info ] got function \"Direct3DCreate9Ex\"\n");
 
 		break;
 
 	case DLL_PROCESS_DETACH:
 		FreeConsole();
 		FreeLibrary(d3d9dll);
-		Log() << "[ info ] DLL detached.";
+		printf("[ info ] DLL detached.\n");
 		break;
 	}
 
 	return true;
 }
-
 
 HRESULT WINAPI Direct3DShaderValidatorCreate9()
 {
