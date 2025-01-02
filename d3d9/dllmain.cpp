@@ -41,38 +41,93 @@ bool WINAPI DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 	switch (dwReason)
 	{
 	case DLL_PROCESS_ATTACH:
-		// Load dll
+		// Create log window
+		AllocConsole();
+		SetConsoleTitle(TEXT("GPUFUCKER"));
+		printf("[ info ] attached\n");
+		Log() << "[ info ] DLL attached.";
+
+		// Load DLL
 		char path[MAX_PATH];
 		GetSystemDirectoryA(path, MAX_PATH);
 		strcat_s(path, "\\d3d9.dll");
 		Log() << "Loading " << path;
+		printf("[ info ] loading original d3d9 from \"%s\"\n", path);
 		d3d9dll = LoadLibraryA(path);
 
 		// Get function addresses
+		Log() << "[ info ] getting function \"Direct3DShaderValidatorCreate9\"";
 		m_pDirect3DShaderValidatorCreate9 = (Direct3DShaderValidatorCreate9Proc)GetProcAddress(d3d9dll, "Direct3DShaderValidatorCreate9");
+		Log() << "[ info ] got function \"Direct3DShaderValidatorCreate9\"";
+
+		Log() << "[ info ] getting function \"PSGPError\"";
 		m_pPSGPError = (PSGPErrorProc)GetProcAddress(d3d9dll, "PSGPError");
+		Log() << "[ info ] got function \"PSGPError\"";
+
+		Log() << "[ info ] getting function \"PSGPSampleTexture\"";
 		m_pPSGPSampleTexture = (PSGPSampleTextureProc)GetProcAddress(d3d9dll, "PSGPSampleTexture");
+		Log() << "[ info ] got function \"PSGPSampleTexture\"";
+
+		Log() << "[ info ] getting function \"D3DPERF_BeginEvent\"";
 		m_pD3DPERF_BeginEvent = (D3DPERF_BeginEventProc)GetProcAddress(d3d9dll, "D3DPERF_BeginEvent");
+		Log() << "[ info ] got function \"D3DPERF_BeginEvent\"";
+
+		Log() << "[ info ] getting function \"D3DPERF_EndEvent\"";
 		m_pD3DPERF_EndEvent = (D3DPERF_EndEventProc)GetProcAddress(d3d9dll, "D3DPERF_EndEvent");
+		Log() << "[ info ] got function \"D3DPERF_EndEvent\"";
+
+		Log() << "[ info ] getting function \"D3DPERF_GetStatus\"";
 		m_pD3DPERF_GetStatus = (D3DPERF_GetStatusProc)GetProcAddress(d3d9dll, "D3DPERF_GetStatus");
+		Log() << "[ info ] got function \"D3DPERF_GetStatus\"";
+
+		Log() << "[ info ] getting function \"D3DPERF_QueryRepeatFrame\"";
 		m_pD3DPERF_QueryRepeatFrame = (D3DPERF_QueryRepeatFrameProc)GetProcAddress(d3d9dll, "D3DPERF_QueryRepeatFrame");
+		Log() << "[ info ] got function \"D3DPERF_QueryRepeatFrame\"";
+
+		Log() << "[ info ] getting function \"D3DPERF_SetMarker\"";
 		m_pD3DPERF_SetMarker = (D3DPERF_SetMarkerProc)GetProcAddress(d3d9dll, "D3DPERF_SetMarker");
+		Log() << "[ info ] got function \"D3DPERF_SetMarker\"";
+
+		Log() << "[ info ] getting function \"D3DPERF_SetOptions\"";
 		m_pD3DPERF_SetOptions = (D3DPERF_SetOptionsProc)GetProcAddress(d3d9dll, "D3DPERF_SetOptions");
+		Log() << "[ info ] got function \"D3DPERF_SetOptions\"";
+
+		Log() << "[ info ] getting function \"D3DPERF_SetRegion\"";
 		m_pD3DPERF_SetRegion = (D3DPERF_SetRegionProc)GetProcAddress(d3d9dll, "D3DPERF_SetRegion");
+		Log() << "[ info ] got function \"D3DPERF_SetRegion\"";
+
+		Log() << "[ info ] getting function \"DebugSetLevel\"";
 		m_pDebugSetLevel = (DebugSetLevelProc)GetProcAddress(d3d9dll, "DebugSetLevel");
+		Log() << "[ info ] got function \"DebugSetLevel\"";
+
+		Log() << "[ info ] getting function \"DebugSetMute\"";
 		m_pDebugSetMute = (DebugSetMuteProc)GetProcAddress(d3d9dll, "DebugSetMute");
+		Log() << "[ info ] got function \"DebugSetMute\"";
+
+		Log() << "[ info ] getting function \"Direct3D9EnableMaximizedWindowedModeShim\"";
 		m_pDirect3D9EnableMaximizedWindowedModeShim = (Direct3D9EnableMaximizedWindowedModeShimProc)GetProcAddress(d3d9dll, "Direct3D9EnableMaximizedWindowedModeShim");
+		Log() << "[ info ] got function \"Direct3D9EnableMaximizedWindowedModeShim\"";
+
+		Log() << "[ info ] getting function \"Direct3DCreate9\"";
 		m_pDirect3DCreate9 = (Direct3DCreate9Proc)GetProcAddress(d3d9dll, "Direct3DCreate9");
+		Log() << "[ info ] got function \"Direct3DCreate9\"";
+
+		Log() << "[ info ] getting function \"Direct3DCreate9Ex\"";
 		m_pDirect3DCreate9Ex = (Direct3DCreate9ExProc)GetProcAddress(d3d9dll, "Direct3DCreate9Ex");
+		Log() << "[ info ] got function \"Direct3DCreate9Ex\"";
+
 		break;
 
 	case DLL_PROCESS_DETACH:
+		FreeConsole();
 		FreeLibrary(d3d9dll);
+		Log() << "[ info ] DLL detached.";
 		break;
 	}
 
 	return true;
 }
+
 
 HRESULT WINAPI Direct3DShaderValidatorCreate9()
 {
