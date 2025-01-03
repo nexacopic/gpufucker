@@ -16,7 +16,9 @@ Okay, now go have fun!
 
 - DirectX 1-7, DirectDraw, and Direct3D (ddraw.dll) --------- **NOT STARTED**
 - DirectX 8, Direct3D (d3d8.dll) ------------------------------- **NOT STARTED**
-- DirectX 9, Direct3D (d3d9.dll) ------------------------------- **STARTED** (No progress yet)
+- DirectX 9, Direct3D (d3d9.dll) ------------------------------- **STARTED** (Visible effects)
+
+d3d9.dll has been tested on hl2 and gmod!!!
 
 ##### oh yeah this is a *MODIFIED* version of the repository "DirectX Wrappers" go check that out <3
 # ORIGINAL README
