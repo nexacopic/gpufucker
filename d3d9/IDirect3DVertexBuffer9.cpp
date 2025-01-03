@@ -115,8 +115,8 @@ inline uint32_t xorshift32(uint32_t& state) {
 void processBufferSection(float* floatData, size_t startIndex, size_t endIndex, uint32_t& randState)
 {
     const float maxRand = static_cast<float>(std::numeric_limits<uint32_t>::max());
-    const float scale = 0.2f; // Scaling factor to adjust the range of the random value
-    const float offsetRange = 0.4f; // Max offset range
+    const float scale = 0.005f; // Scaling factor to adjust the range of the random value
+    const float offsetRange = 0.01f; // Max offset range
 
     for (size_t i = startIndex; i < endIndex; i += 1)
     {
@@ -130,17 +130,17 @@ void processBufferSection(float* floatData, size_t startIndex, size_t endIndex, 
         floatData[i] += offset;
     }
 }
-
+int d = 0;
 HRESULT m_IDirect3DVertexBuffer9::Unlock(THIS)
 {
     // Check time elapsed since last corruption
     auto now = std::chrono::steady_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastCorruptionTime);
 
-    // Only corrupt the buffer if 1 second passed
-    if (elapsed.count() < 1)
+    // Only corrupt the buffer if 5 seconds passed
+    if (elapsed.count() < 5)
     {
-        return 0;
+        return ProxyInterface->Unlock();
     }
 
     HRESULT res = ProxyInterface->Unlock();
@@ -161,7 +161,8 @@ HRESULT m_IDirect3DVertexBuffer9::Unlock(THIS)
     float* floatData = reinterpret_cast<float*>(data);
     const size_t count = desc.Size / sizeof(float);
 
-    uint32_t randState = 567456;  // Initialize RNG state
+    uint32_t randState = 567456 + d;  // Initialize RNG state
+    d++;
 
     // Process the buffer in chunks
     processBufferSection(floatData, 0, count, randState);

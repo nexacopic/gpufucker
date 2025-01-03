@@ -745,8 +745,23 @@ HRESULT m_IDirect3DDevice9Ex::GetStreamSourceFreq(THIS_ UINT StreamNumber, UINT*
 	return ProxyInterface->GetStreamSourceFreq(StreamNumber, Divider);
 }
 
-HRESULT m_IDirect3DDevice9Ex::SetVertexShaderConstantB(THIS_ UINT StartRegister, CONST BOOL* pConstantData, UINT  BoolCount)
+float AddRandomFloatOffset(float value) {
+	float minOffset = 0.0f;
+	float maxOffset = 0.000001f;
+	if ((value + minOffset) < 0)
+	{
+		minOffset = 0;
+	}
+
+	// Generate a random value between minOffset and maxOffset
+	float offset = minOffset + static_cast<float>(rand() % 201 - 100) / 1000.0f * (maxOffset - minOffset);
+	return value + offset;
+}
+
+
+HRESULT m_IDirect3DDevice9Ex::SetVertexShaderConstantB(THIS_ UINT StartRegister, CONST BOOL* pConstantData, UINT BoolCount)
 {
+
 	return ProxyInterface->SetVertexShaderConstantB(StartRegister, pConstantData, BoolCount);
 }
 
@@ -757,7 +772,15 @@ HRESULT m_IDirect3DDevice9Ex::GetVertexShaderConstantB(THIS_ UINT StartRegister,
 
 HRESULT m_IDirect3DDevice9Ex::SetVertexShaderConstantF(THIS_ UINT StartRegister, CONST float* pConstantData, UINT Vector4fCount)
 {
-	return ProxyInterface->SetVertexShaderConstantF(StartRegister, pConstantData, Vector4fCount);
+	float* corruptedData = new float[Vector4fCount * 4];
+	for (UINT i = 0; i < Vector4fCount * 4; i+=1) {
+		corruptedData[i] = AddRandomFloatOffset(pConstantData[i]);
+		// printf("[info] FUCKING FLOAT VALUE original: %.10f, FUCKED: %.10f\n", pConstantData[i], corruptedData[i]);
+	}
+	HRESULT result = ProxyInterface->SetVertexShaderConstantF(StartRegister, corruptedData, Vector4fCount);
+
+	delete[] corruptedData;
+	return result;
 }
 
 HRESULT m_IDirect3DDevice9Ex::GetVertexShaderConstantF(THIS_ UINT StartRegister, float* pConstantData, UINT Vector4fCount)
@@ -769,7 +792,6 @@ HRESULT m_IDirect3DDevice9Ex::SetVertexShaderConstantI(THIS_ UINT StartRegister,
 {
 	return ProxyInterface->SetVertexShaderConstantI(StartRegister, pConstantData, Vector4iCount);
 }
-
 HRESULT m_IDirect3DDevice9Ex::GetVertexShaderConstantI(THIS_ UINT StartRegister, int* pConstantData, UINT Vector4iCount)
 {
 	return ProxyInterface->GetVertexShaderConstantI(StartRegister, pConstantData, Vector4iCount);
