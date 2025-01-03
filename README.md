@@ -21,6 +21,8 @@ Okay, now go have fun!
 d3d9.dll has been tested on hl2 and gmod!!!
 
 ##### oh yeah this is a *MODIFIED* version of the repository "DirectX Wrappers" go check that out <3
+##### its recommended to build for release as debug is VERY VERY slow....
+
 # ORIGINAL README
 # DirectX Wrappers
 
