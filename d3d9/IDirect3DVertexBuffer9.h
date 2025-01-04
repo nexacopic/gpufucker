@@ -2,6 +2,7 @@
 #define NOMINMAX
 #include <random>
 #include <thread>
+#include "d3d9.h"
 class m_IDirect3DVertexBuffer9 : public IDirect3DVertexBuffer9, public AddressLookupTableObject
 {
 private:

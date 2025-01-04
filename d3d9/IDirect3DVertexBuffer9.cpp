@@ -14,8 +14,10 @@
 *   3. This notice may not be removed or altered from any source distribution.
 */
 #define NOMINMAX
+#include <Windows.h>
 #include <random>
 #include <thread>
+#include "IDirect3DVertexBuffer9.h"
 #include "d3d9.h"
 
 
