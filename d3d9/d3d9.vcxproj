@@ -152,6 +152,7 @@
   <ItemGroup>
     <ClInclude Include="AddressLookupTable.h" />
     <ClInclude Include="d3d9.h" />
+    <ClInclude Include="FuckerConfig.h" />
     <ClInclude Include="IDirect3D9Ex.h" />
     <ClInclude Include="IDirect3DCubeTexture9.h" />
     <ClInclude Include="IDirect3DDevice9Ex.h" />

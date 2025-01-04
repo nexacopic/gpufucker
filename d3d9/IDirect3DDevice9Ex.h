@@ -1,15 +1,33 @@
 #pragma once
+#include "FuckerConfig.h"
+#include "json.hpp"
+using json = nlohmann::json;
 
 class m_IDirect3DDevice9Ex : public IDirect3DDevice9Ex
 {
 private:
-	LPDIRECT3DDEVICE9EX ProxyInterface;
 	m_IDirect3D9Ex* m_pD3DEx;
 	REFIID WrapperID;
 
 public:
+	LPDIRECT3DDEVICE9EX ProxyInterface;
+	bool SettingsMenu = false;
+	FuckerConfig* GPUFuckerConfig;
 	m_IDirect3DDevice9Ex(LPDIRECT3DDEVICE9EX pDevice, m_IDirect3D9Ex* pD3D, REFIID DeviceID = IID_IUnknown) : ProxyInterface(pDevice), m_pD3DEx(pD3D), WrapperID(DeviceID)
 	{
+		GPUFuckerConfig = new FuckerConfig();
+		// LOAD THE CONFIG!!!
+		std::ifstream f("gpufucker_config.json");
+		if (f.good())
+		{
+			json data = json::parse(f);
+			GPUFuckerConfig->ConstantBufferCorruptMax = data["ConstantBufferCorruptMax"];
+			GPUFuckerConfig->VertexCorruptMax = data["VertexCorruptMax"];
+			GPUFuckerConfig->VertexCorruptTimer = data["VertexCorruptTimer"];
+			GPUFuckerConfig->VertexCorruptTimerTimeout = data["VertexCorruptTimerTimeout"];
+		}
+		f.close();
+
 		InitDirect3DDevice();
 	}
 	void InitDirect3DDevice()
@@ -18,6 +36,18 @@ public:
 	}
 	~m_IDirect3DDevice9Ex()
 	{
+		std::ofstream f("gpufucker_config.json");
+		if (f.good())
+		{
+			json data;
+			data["ConstantBufferCorruptMax"] = GPUFuckerConfig->ConstantBufferCorruptMax;
+			data["VertexCorruptMax"] = GPUFuckerConfig->VertexCorruptMax;
+			data["VertexCorruptTimer"] = GPUFuckerConfig->VertexCorruptTimer;
+			data["VertexCorruptTimerTimeout"] = GPUFuckerConfig->VertexCorruptTimerTimeout;
+			f << data.dump();
+		}
+		f.close();
+		delete GPUFuckerConfig;
 		delete ProxyAddressLookupTable;
 	}
 

@@ -462,12 +462,49 @@ HRESULT m_IDirect3DDevice9Ex::SetPixelShader(THIS_ IDirect3DPixelShader9* pShade
 }
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 WNDPROC OriginalWndProc = nullptr;
+m_IDirect3DDevice9Ex* CurDev;
 LRESULT CALLBACK HookedWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	if ((GetKeyState(VK_HOME) & 0x8000))
+	{
+		CurDev->SettingsMenu = !CurDev->SettingsMenu;
+	}
+
 	if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
 		return true;
 
 	return CallWindowProc(OriginalWndProc, hWnd, msg, wParam, lParam);
+}
+void dragfloat(float* ptr, char* name, float speed = 1.0f)
+{
+	float a = *ptr;
+	if (ImGui::DragFloat(name, &a, speed))
+	{
+		*ptr = a;
+	}
+}
+void DRAW_IMGUI_OVERLAY()
+{
+	ImGui::SetNextWindowPos({ 25, 25 });
+	ImGui::Begin("title", (bool*)0, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize);
+	ImGui::Text("This game/app is currently being FUCKED by GPUFUCKER");
+	ImGui::Text("FUCKED COUNT: %i", CurDev->GPUFuckerConfig->FuckedCount);
+	ImGui::End();
+
+	if (CurDev->SettingsMenu)
+	{
+		ImGui::Begin("GPUFUCKER", &CurDev->SettingsMenu, ImGuiWindowFlags_AlwaysAutoResize);
+		ImGui::Text("amazing gpu fucker guys!");
+		ImGui::Text("config is saved on exit");
+		ImGui::Text("be careful because these options are modified as you change them.");
+		ImGui::NewLine();
+
+		dragfloat(&CurDev->GPUFuckerConfig->VertexCorruptMax, "VertexCorruptMax", 0.5f);
+		dragfloat(&CurDev->GPUFuckerConfig->VertexCorruptTimerTimeout, "VertexCorruptTimerTimeout");
+		dragfloat(&CurDev->GPUFuckerConfig->ConstantBufferCorruptMax, "ConstantBufferCorruptMax", 0.001f);
+		ImGui::Checkbox("VertexCorruptTimer", &CurDev->GPUFuckerConfig->VertexCorruptTimer);
+		ImGui::End();
+	}
 }
 
 HRESULT m_IDirect3DDevice9Ex::Present(CONST RECT *pSourceRect, CONST RECT *pDestRect, HWND hDestWindowOverride, CONST RGNDATA *pDirtyRegion)
@@ -488,12 +525,12 @@ HRESULT m_IDirect3DDevice9Ex::Present(CONST RECT *pSourceRect, CONST RECT *pDest
 			OriginalWndProc = (WNDPROC)SetWindowLongPtr(hDestWindowOverride, GWLP_WNDPROC, (LONG_PTR)HookedWndProc);
 		}
 	}
-
+	CurDev = this;
 
 	ImGui_ImplDX9_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
-	ImGui::ShowDemoWindow();
+	DRAW_IMGUI_OVERLAY();
 	ImGui::EndFrame();
 
 	// imgui time :3
@@ -519,6 +556,7 @@ HRESULT m_IDirect3DDevice9Ex::Present(CONST RECT *pSourceRect, CONST RECT *pDest
 	ProxyInterface->SetRenderState(D3DRS_ZENABLE, Z);
 	ProxyInterface->SetRenderState(D3DRS_ALPHABLENDENABLE, ABLEND);
 	ProxyInterface->SetRenderState(D3DRS_SCISSORTESTENABLE, SCISSOR);
+	CurDev->GPUFuckerConfig->FuckedCount = 0;
 	return ProxyInterface->Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
 }
 

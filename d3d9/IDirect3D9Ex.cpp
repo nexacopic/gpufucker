@@ -135,9 +135,9 @@ HRESULT m_IDirect3D9Ex::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND h
 		// Setup Platform/Renderer backends
 		printf("[imgui] init_win32\n");
 		ImGui_ImplWin32_Init(hFocusWindow);
-		printf("[imgui] init_dx9\n");
-		ImGui_ImplDX9_Init(*ppReturnedDeviceInterface);
 		*ppReturnedDeviceInterface = new m_IDirect3DDevice9Ex((IDirect3DDevice9Ex*)*ppReturnedDeviceInterface, this, IID_IDirect3DDevice9);
+		printf("[imgui] init_dx9\n");
+		ImGui_ImplDX9_Init(((m_IDirect3DDevice9Ex*)ppReturnedDeviceInterface)->ProxyInterface);
 	}
 	return hr;
 }

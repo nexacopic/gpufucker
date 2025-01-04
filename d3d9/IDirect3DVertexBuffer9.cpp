@@ -112,16 +112,25 @@ inline uint32_t xorshift32(uint32_t& state) {
     state ^= state << 5;
     return state;
 }
-
+m_IDirect3DVertexBuffer9* CurBuf;
+m_IDirect3DDevice9Ex* device;
+bool useConfig = false;
 // Optimized buffer processing: using larger stride for fewer loop overheads
 void processBufferSection(float* floatData, size_t startIndex, size_t endIndex, uint32_t& randState)
 {
     const float maxRand = static_cast<float>(std::numeric_limits<uint32_t>::max());
-    const float scale = 0.005f; // Scaling factor to adjust the range of the random value
-    const float offsetRange = 0.01f; // Max offset range
+
+    float scale = 0.005f;
+    float offsetRange = 0.01f;
+    if (useConfig)
+    {
+        scale = device->GPUFuckerConfig->VertexCorruptMax / 2;
+        scale = device->GPUFuckerConfig->VertexCorruptMax;
+    }
 
     for (size_t i = startIndex; i < endIndex; i += 1)
     {
+        device->GPUFuckerConfig->FuckedCount++;
         // Generate a pseudo-random value using xorshift32
         uint32_t randomValue = xorshift32(randState);
 
@@ -135,15 +144,25 @@ void processBufferSection(float* floatData, size_t startIndex, size_t endIndex, 
 int d = 0;
 HRESULT m_IDirect3DVertexBuffer9::Unlock(THIS)
 {
+    CurBuf = this;
+    m_IDirect3DDevice9Ex* dev;
+    if (SUCCEEDED(CurBuf->GetDevice((IDirect3DDevice9**)&dev)))
+    {
+        useConfig = true;
+        device = dev;
+    }
     // Check time elapsed since last corruption
     auto now = std::chrono::steady_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastCorruptionTime);
 
-    // Only corrupt the buffer if 5 seconds passed
-    if (elapsed.count() < 5)
+    if (device->GPUFuckerConfig->VertexCorruptTimer)
     {
-        return ProxyInterface->Unlock();
+        if (elapsed.count() < 5)
+        {
+            return ProxyInterface->Unlock();
+        }
     }
+    
 
     HRESULT res = ProxyInterface->Unlock();
     if (!SUCCEEDED(res)) return res;
