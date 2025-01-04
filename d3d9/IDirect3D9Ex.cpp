@@ -13,7 +13,9 @@
 *      being the original software.
 *   3. This notice may not be removed or altered from any source distribution.
 */
-
+#include "imgui.h"
+#include "imgui_impl_dx9.h"
+#include "imgui_impl_win32.h"
 #include "d3d9.h"
 
 HRESULT m_IDirect3D9Ex::QueryInterface(REFIID riid, void** ppvObj)
@@ -118,9 +120,22 @@ HRESULT m_IDirect3D9Ex::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND h
 
 	if (SUCCEEDED(hr) && ppReturnedDeviceInterface)
 	{
+		// create imgui shit :3
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+		// Setup Dear ImGui style
+		ImGui::StyleColorsDark();
+		//ImGui::StyleColorsLight();
+
+		// Setup Platform/Renderer backends
+		ImGui_ImplWin32_Init(hFocusWindow);
+		ImGui_ImplDX9_Init(*ppReturnedDeviceInterface);
 		*ppReturnedDeviceInterface = new m_IDirect3DDevice9Ex((IDirect3DDevice9Ex*)*ppReturnedDeviceInterface, this, IID_IDirect3DDevice9);
 	}
-
 	return hr;
 }
 

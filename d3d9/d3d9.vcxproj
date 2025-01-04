@@ -72,6 +72,7 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
+      <AdditionalIncludeDirectories>$(SolutionDir)Common\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -83,6 +84,7 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
+      <AdditionalIncludeDirectories>$(SolutionDir)Common\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -94,6 +96,7 @@
       <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>
       </PrecompiledHeader>
+      <AdditionalIncludeDirectories>$(SolutionDir)Common\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -112,6 +115,7 @@
       <ExceptionHandling>false</ExceptionHandling>
       <FloatingPointModel>Fast</FloatingPointModel>
       <BufferSecurityCheck>false</BufferSecurityCheck>
+      <AdditionalIncludeDirectories>$(SolutionDir)Common\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -120,6 +124,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Common\imgui.cpp" />
+    <ClCompile Include="..\Common\imgui_demo.cpp" />
+    <ClCompile Include="..\Common\imgui_draw.cpp" />
+    <ClCompile Include="..\Common\imgui_impl_dx9.cpp" />
+    <ClCompile Include="..\Common\imgui_impl_win32.cpp" />
+    <ClCompile Include="..\Common\imgui_tables.cpp" />
+    <ClCompile Include="..\Common\imgui_widgets.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="IDirect3D9Ex.cpp" />
     <ClCompile Include="IDirect3DCubeTexture9.cpp" />

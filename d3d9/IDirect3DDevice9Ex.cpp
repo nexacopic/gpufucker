@@ -13,7 +13,9 @@
 *      being the original software.
 *   3. This notice may not be removed or altered from any source distribution.
 */
-
+#include "imgui.h"
+#include "imgui_impl_dx9.h"
+#include "imgui_impl_win32.h"
 #include "d3d9.h"
 
 HRESULT m_IDirect3DDevice9Ex::QueryInterface(REFIID riid, void** ppvObj)
@@ -44,6 +46,10 @@ ULONG m_IDirect3DDevice9Ex::AddRef()
 
 ULONG m_IDirect3DDevice9Ex::Release()
 {
+	ImGui_ImplDX9_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
+	
 	ULONG count = ProxyInterface->Release();
 
 	if (count == 0)
@@ -457,6 +463,35 @@ HRESULT m_IDirect3DDevice9Ex::SetPixelShader(THIS_ IDirect3DPixelShader9* pShade
 
 HRESULT m_IDirect3DDevice9Ex::Present(CONST RECT *pSourceRect, CONST RECT *pDestRect, HWND hDestWindowOverride, CONST RGNDATA *pDirtyRegion)
 {
+	ImGui_ImplDX9_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+	ImGui::ShowDemoWindow();
+	ImGui::EndFrame();
+
+	// imgui time :3
+	DWORD Z;
+	ProxyInterface->GetRenderState(D3DRS_ZENABLE, &Z);
+	DWORD ABLEND;
+	ProxyInterface->GetRenderState(D3DRS_ALPHABLENDENABLE, &ABLEND);
+	DWORD SCISSOR;
+	ProxyInterface->GetRenderState(D3DRS_SCISSORTESTENABLE, &SCISSOR);
+
+
+	ProxyInterface->SetRenderState(D3DRS_ZENABLE, FALSE);
+	ProxyInterface->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+	ProxyInterface->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
+
+	if (ProxyInterface->BeginScene() >= 0)
+	{
+		ImGui::Render();
+		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+		ProxyInterface->EndScene();
+	}
+
+	ProxyInterface->SetRenderState(D3DRS_ZENABLE, Z);
+	ProxyInterface->SetRenderState(D3DRS_ALPHABLENDENABLE, ABLEND);
+	ProxyInterface->SetRenderState(D3DRS_SCISSORTESTENABLE, SCISSOR);
 	return ProxyInterface->Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
 }
 
