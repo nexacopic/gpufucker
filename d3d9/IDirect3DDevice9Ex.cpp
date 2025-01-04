@@ -460,9 +460,36 @@ HRESULT m_IDirect3DDevice9Ex::SetPixelShader(THIS_ IDirect3DPixelShader9* pShade
 
 	return ProxyInterface->SetPixelShader(pShader);
 }
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+WNDPROC OriginalWndProc = nullptr;
+LRESULT CALLBACK HookedWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
+		return true;
+
+	return CallWindowProc(OriginalWndProc, hWnd, msg, wParam, lParam);
+}
 
 HRESULT m_IDirect3DDevice9Ex::Present(CONST RECT *pSourceRect, CONST RECT *pDestRect, HWND hDestWindowOverride, CONST RGNDATA *pDirtyRegion)
 {
+	if (!OriginalWndProc)
+	{
+		if (!hDestWindowOverride)
+		{
+			D3DDEVICE_CREATION_PARAMETERS params;
+			if (SUCCEEDED(ProxyInterface->GetCreationParameters(&params)))
+			{
+				hDestWindowOverride = params.hFocusWindow;
+			}
+		}
+
+		if (hDestWindowOverride)
+		{
+			OriginalWndProc = (WNDPROC)SetWindowLongPtr(hDestWindowOverride, GWLP_WNDPROC, (LONG_PTR)HookedWndProc);
+		}
+	}
+
+
 	ImGui_ImplDX9_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
