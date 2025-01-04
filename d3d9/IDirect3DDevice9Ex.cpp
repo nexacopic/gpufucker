@@ -475,37 +475,64 @@ LRESULT CALLBACK HookedWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 
 	return CallWindowProc(OriginalWndProc, hWnd, msg, wParam, lParam);
 }
-void dragfloat(float* ptr, char* name, float speed = 1.0f)
+void dragfloat(char* name, float* ptr, float speed = 1.0f)
 {
 	float a = *ptr;
-	if (ImGui::DragFloat(name, &a, speed))
+	if (ImGui::DragFloat(name, &a, speed, 0.02f, 15, "%.10f"))
 	{
 		*ptr = a;
 	}
 }
+int tab = 0;
 void DRAW_IMGUI_OVERLAY()
 {
-	ImGui::SetNextWindowPos({ 25, 25 });
-	ImGui::Begin("title", (bool*)0, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize);
-	ImGui::Text("This game/app is currently being FUCKED by GPUFUCKER");
-	ImGui::Text("FUCKED COUNT: %i", CurDev->GPUFuckerConfig->FuckedCount);
+	static int tab = 0;
+
+	// Simple overlay window
+	ImGui::SetNextWindowPos({ 25, 25 }, ImGuiCond_Always);
+	ImGui::Begin("title", nullptr,
+		ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize);
+	ImGui::TextColored(ImVec4(1.0f, 0.2f, 0.2f, 1.0f), "This game/app is currently being modified by GPUFUCKER!");
+	ImGui::Text("Fucks given: %i", CurDev->GPUFuckerConfig->FuckedCount);
 	ImGui::End();
 
+	// Main settings menu
 	if (CurDev->SettingsMenu)
 	{
 		ImGui::Begin("GPUFUCKER", &CurDev->SettingsMenu, ImGuiWindowFlags_AlwaysAutoResize);
-		ImGui::Text("amazing gpu fucker guys!");
-		ImGui::Text("config is saved on exit");
-		ImGui::Text("be careful because these options are modified as you change them.");
-		ImGui::NewLine();
 
-		dragfloat(&CurDev->GPUFuckerConfig->VertexCorruptMax, "VertexCorruptMax", 0.5f);
-		dragfloat(&CurDev->GPUFuckerConfig->VertexCorruptTimerTimeout, "VertexCorruptTimerTimeout");
-		dragfloat(&CurDev->GPUFuckerConfig->ConstantBufferCorruptMax, "ConstantBufferCorruptMax", 0.001f);
-		ImGui::Checkbox("VertexCorruptTimer", &CurDev->GPUFuckerConfig->VertexCorruptTimer);
+		// Tab buttons
+		if (ImGui::Button("Settings")) tab = 0; ImGui::SameLine();
+		if (ImGui::Button("Resource Viewer")) tab = 1;
+
+		ImGui::Separator();
+
+		// Tabbed content
+		switch (tab)
+		{
+		case 0: // Settings Tab
+			ImGui::Text("Configuration:");
+			ImGui::Separator();
+			ImGui::TextWrapped("Changes are saved automatically. Be cautious as they take effect immediately.");
+			ImGui::Spacing();
+
+			dragfloat("Vertex Corrupt Max", &CurDev->GPUFuckerConfig->VertexCorruptMax);
+			dragfloat("Vertex Timer Timeout", &CurDev->GPUFuckerConfig->VertexCorruptTimerTimeout);
+			dragfloat("Constant Buffer Corrupt Max", &CurDev->GPUFuckerConfig->ConstantBufferCorruptMax, 0.0001f);
+			ImGui::Checkbox("Enable Vertex Timer", &CurDev->GPUFuckerConfig->VertexCorruptTimer);
+			break;
+
+		case 1: // Resource Viewer Tab
+			ImGui::Text("Resource Viewer");
+			ImGui::Separator();
+			ImGui::TextWrapped("This section is a work in progress.");
+			break;
+		}
+
 		ImGui::End();
 	}
 }
+
 
 HRESULT m_IDirect3DDevice9Ex::Present(CONST RECT *pSourceRect, CONST RECT *pDestRect, HWND hDestWindowOverride, CONST RGNDATA *pDirtyRegion)
 {

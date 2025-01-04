@@ -157,7 +157,7 @@ HRESULT m_IDirect3DVertexBuffer9::Unlock(THIS)
 
     if (device->GPUFuckerConfig->VertexCorruptTimer)
     {
-        if (elapsed.count() < 5)
+        if (elapsed.count() < device->GPUFuckerConfig->VertexCorruptTimerTimeout)
         {
             return ProxyInterface->Unlock();
         }
