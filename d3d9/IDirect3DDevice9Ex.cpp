@@ -492,7 +492,7 @@ void DRAW_IMGUI_OVERLAY()
 	ImGui::SetNextWindowPos({ 25, 25 }, ImGuiCond_Always);
 	ImGui::Begin("title", nullptr,
 		ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize);
-	ImGui::TextColored(ImVec4(1.0f, 0.2f, 0.2f, 1.0f), "This game/app is currently being modified by GPUFUCKER!");
+	ImGui::TextColored(ImVec4(1.0f, 0.2f, 0.2f, 1.0f), "This game/app is currently being FUCKED by GPUFUCKER!");
 	ImGui::Text("Fucks given: %i", CurDev->GPUFuckerConfig->FuckedCount);
 	ImGui::End();
 
